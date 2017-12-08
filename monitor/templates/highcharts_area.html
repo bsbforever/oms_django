@@ -1,0 +1,63 @@
+<div id ='new add'>
+<script>
+        $(function () {
+    $('#container').highcharts({
+        chart: {
+            type: 'area'
+        },
+        title: {
+            text: '{{title|safe}}',
+        },
+        //subtitle: {
+          //  text: 'Source: <a href="http://thebulletin.metapress.com/content/c4120650912x74k7/fulltext.pdf">' +
+            //    'thebulletin.metapress.com</a>'
+        //},
+        xAxis: {
+            categories: {{categories|safe}}
+        },
+        
+        //xAxis: {
+          //  allowDecimals: false,
+            //labels: {
+              //  formatter: function () {
+                //    return this.value; // clean, unformatted number for year
+                //}
+           // }
+        //},
+        yAxis: {
+            title: {
+                text: 'Unit:{{unit}}'
+            },
+            labels: {
+                formatter: function () {
+                    return this.value;
+                }
+            }
+        },
+        //plotOptions: {
+          //  area: {
+            //    pointStart: 1940,
+              //  marker: {
+                //    enabled: false,
+                  //  symbol: 'circle',
+                    //radius: 2,
+                    //states: {
+                      //  hover: {
+                        //    enabled: true
+                        //}
+                    //}
+                //}
+            //}
+        //},
+        series:[
+                {% for i in series %}
+                {
+                    name: '{{i.name}}',
+                    data: {{i.data}}
+                    },
+                {% endfor %}
+                ]                    
+        });
+});                       
+</script>
+</div>

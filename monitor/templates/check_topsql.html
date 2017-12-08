@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block jscript%}
+<script>
+function ck(b)
+{
+    var input = document.getElementsByTagName("input");
+
+    for (var i=0;i<input.length ;i++ )
+    {
+        if(input[i].type=="checkbox")
+            input[i].checked = b;
+    }
+}
+</script>
+
+<script>
+
+$(function() {
+    var frm=$('#usubmit');
+    frm.submit(function (ev) {
+        $.ajax({
+            type:frm.attr('method'),
+            url:frm.attr('action'),
+            data:frm.serialize(),
+            success: function (data) {
+                //alert(data);
+                $('#newadd').remove()
+                $('#content').append(data);
+            }
+
+   });
+    ev.preventDefault();
+})
+
+})
+</script>
+
+
+
+{%endblock%}
+
+{% block topsql %} <li class="active"><a href="/monitor/check_topsql">数据库TOPSQL</a></li>{% endblock %}
+
+
+{% block content %}
+
+
+<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" id='content'>
+    <h1 class='page-header'>数据库TOPSQL</h1>
+
+
+
+
+<form  id='usubmit' action="/monitor/check_topsql" method="post">{% csrf_token %}
+
+<p><h3>请选择需要查询的数据库</h3></p>
+<br/>
+{{ form.as_p }}
+{{form.errors.as_p}}
+<p><label>开始时间: </label><input id="d11" name ="starttime" value="{{stime}}" type="text" class="Wdate" onFocus="WdatePicker({isShowWeek:true,lang:'zh-cn',dateFmt:'yyyyMMdd HH'})"/></p>
+<p><label>结束时间:</label><input id="d11" name ="endtime"  value="{{etime}}" type="text"  class="Wdate" onFocus="WdatePicker({isShowWeek:true,lang:'zh-cn',dateFmt:'yyyyMMdd HH'})"/></p>
+<p><input type="submit" value="提交" /></p>
+
+</form>
+</div>
+
+<div id="container" style="min-width:700px;height:400px"></div>
+
+
+{% endblock %}

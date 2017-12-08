@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block jscript%}
+<script>
+$(function() {
+    var a= $('#operate');
+    var b= $('#sqlarea');
+    var options= $('#operate option');
+    a.on('change',function() {
+        var result=$('#operate option').filter(':selected').val();
+        names=['check_analyzed_time','check_process_text' ,'check_session_process' ,'check_sqlplan' ,'check_unboundsql']
+        //alert(result)
+        if ($.inArray(result,names)>-1){
+            b.show();
+      } else
+            b.hide();
+       });
+
+})
+
+</script>
+
+<script>
+$(function(){
+var c=$('#sql1')
+c.on('focus',function(){
+        c.innerHTML=''
+        //alert('sa')
+        })
+})
+</script>
+
+
+<script>
+
+$(function() {
+    var frm=$('#usubmit');
+    frm.submit(function (ev) {
+        $.ajax({
+            type:frm.attr('method'),
+            url:frm.attr('action'),
+            data:frm.serialize(),
+            success: function (data) {
+                //alert(data);
+                $('#newadd').remove()
+                $('#content').append(data);
+            }
+
+   });
+    ev.preventDefault();
+})
+
+})
+</script>
+
+
+{%endblock%}
+
+{% block command %} <li class="active"><a href="/monitor/oracle_command">Oracle命令</a></li>{% endblock %}
+
+
+{% block content %}
+
+
+<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" id='content'>
+    <h1 class='page-header'>Oracle命令</h1>
+<form  id='usubmit'action="/monitor/commandresult/" method="get">
+<div class="form-group">
+    <label for="ipaddress">请选择数据库</label>
+    <select class="form-control"  id="ipaddress" name="ipaddress">
+  {% for x in result %}
+      <option value ="{{ x.ipaddress}}-{{x.tnsname}}">{{ x.tnsname }} {{x.ipaddress}}</option>
+  {% endfor %}
+     </select>
+</div>
+<div class="form-group">
+    <label for="operate">请选择命令</label>
+  <select  class="form-control" id="operate"  name="operate">
+      <option value ='check_datafile_time' selected="selected">检查数据文件创建时间</option>
+      <option value ='check_analyzed_time'>检查表的分析时间</option>
+      <option value ='check_segments_size'>查看数据库段的大小</option>
+      <option value ='check_process_text'>查看进程对应的SQL语句</option>
+      <option value ='check_session_process'>查看会话对应的进程号</option>
+      <option value ='check_temp_usage'>检查临时表空间使用率</option>
+      <option value ='check_executions'>检查执行次数等于一的语句</option>
+      <option value ='check_unboundsql'>检查未绑定语句</option>
+      <option value ='check_session_count'>检查Session数量</option>
+     </select>
+</div>
+
+<div id='sqlarea'  class="form-group" hidden>
+    <label for="sql22">请输入相关文本</label>
+    <textarea class="form-control" name='sql' id='sql1' rows=1 ></textarea>
+</div>
+
+<button type="submit"  class="btn btn-primary" value="OK">确定</button>
+</form>
+
+</div>
+
+
+
+{% endblock %}

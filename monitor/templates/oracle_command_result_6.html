@@ -1,0 +1,25 @@
+<div id='newadd'>
+<h3>{{title}}</h3>
+<table class="table">
+  <thead>
+    <tr>
+{% for i in tr %}
+        <th>{{i}}</th>
+{%endfor%}
+    </tr>
+  </thead>
+{% for a,b,c,d,e,f in row %}
+<tbody>
+            <tr>
+                <td>{{a}}</td>
+                <td>{{b}}</td>
+                <td>{{c}}</td>
+                <td>{{d}}</td>
+                <td>{{e}}</td>
+                <td>{{f}}</td>
+            </tr>
+</tbody>
+{% endfor %}
+</table>
+</div>
+

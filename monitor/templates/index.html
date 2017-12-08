@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block overview %} <li class="active"><a href="/monitor/">首页</a></li>{% endblock %}
+{%block jscript%} 
+
+<script>
+    $(document).ready(function(){
+          $("#table").fitText();
+  });
+</script>
+
+{%endblock%}
+{% block content %}
+<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" id='content'>
+    <h1 class='page-header'>数据库概况</h1>
+<div class="table-responsive">
+<table class="table" id='table1' class="table table-striped" width='1052'>
+  <thead>
+    <tr>
+      <th>数据库</th>
+      <th>IP地址</th>
+      <th>端口</th>
+      <th>主机名</th>
+      <th>版本</th>
+      <th>字符集</th>
+      <th>国家字符集</th>
+      <th>日志位置</th>
+     <!--   <th>用途</th>    -->
+    </tr>
+  </thead>
+{% for i in result %}
+<tbody>
+            <tr>
+                <td>{{i.tnsname}}</td>
+                <td>{{i.ipaddress}}</td>
+                <td>{{i.port}}</td>
+                <td>{{i.hostname}}</td>
+                <td>{{i.version}}</td>
+                <td>{{i.charset}}</td>
+                <td>{{i.ncharset}}</td>
+                <td>{{i.alertpath}}</td>
+<!--                <td>{{i.content}}</td>   -->
+            </tr>
+</tbody>
+{% endfor %}
+</table>
+</div>
+</div>
+</div>
+{% endblock %}

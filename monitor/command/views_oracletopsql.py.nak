@@ -1,0 +1,454 @@
+import re
+import os
+import time
+import datetime
+import MySQLdb
+import pandas
+def check_segmentsizechange(starttime,endtime,ipaddress,tnsname,topsql_type,top):
+    hour=0
+    result={}
+    for i in range(starttime,endtime,86400):
+        hour=hour+1
+    topsql=[]
+    top10sql=[]
+    outsql=[]
+    conn=MySQLdb.connect(host='localhost',user='root',passwd='123456',db='oracle',port=3306)
+    cur=conn.cursor()
+    getsql_text='select * from oracle_segmentsizechange where segment_time <='+ str(endtime)+' and segment_time >='+str(starttime)+' and tnsname=\''+tnsname+'\' and ipaddress=\''+ipaddress+'\' order by ipaddress,tnsname,OWNER,segment_name,	partition_name,segment_type,segment_time'
+    cur.execute(getsql_text)
+    row=cur.fetchall()
+    cur.close()
+    conn.close()
+    count=hour
+    sql_id='sql_id'
+    for i in row:
+        if i[6] is None:
+            name=i[4]+'_'+i[5]+'_'+i[7]+'_'+i[8]
+        else:
+            name=i[4]+'_'+i[5]+'_'+i[6]+'_'+i[7]+'_'+i[8]
+        if name==sql_id:
+            count=count+1
+            if count==hour:
+                maxtime=i
+                owner=maxtime[4]
+                segment_name=maxtime[5]
+                patition_name=maxtime[6]
+                segment_type=maxtime[7]
+                tablespace_name=maxtime[8]
+                segment_bytes=maxtime[9]/1024/1024
+                byteschange=(maxtime[9]-mintime[9])/1024/1024
+                byteschangeperday=byteschange/(hour-1)
+                blockschange=maxtime[10]-mintime[10]
+                topsql.append([owner,segment_name,patition_name,segment_type,tablespace_name,segment_bytes,byteschange,blockschange,byteschangeperday])
+        else:
+            if count!=hour and sql_id !='sql_id':
+                outsql1=str(mintime[4])+'-'+str(mintime[5])+' is wrapped out '+str(hour-count)+' times'
+                outsql.append(outsql1)
+            mintime=i
+            count=1
+            if i[6] is None:
+                sql_id=i[4]+'_'+i[5]+'_'+i[7]+'_'+i[8]
+            else:
+                sql_id=i[4]+'_'+i[5]+'_'+i[6]+'_'+i[7]+'_'+i[8]
+
+    if topsql_type=='elapsedtime':
+        topsql.sort(key=lambda x:x[6],reverse=True)
+    else:
+        topsql.sort(key=lambda x:x[6],reverse=True)
+    for n in range(0,top if len(topsql)>=top else len(topsql)):
+        top10sql.append(topsql[n])
+    result['top10sql']=top10sql
+    if len(outsql)!=0:
+        result['outsql']=outsql
+    else:
+        result['outsql']=[]
+    return result
+def check_topsql_topsegment(starttime,endtime,ipaddress,tnsname,topsql_type,top):
+    hour=0
+    result={}
+    for i in range(starttime,endtime,3600):
+        hour=hour+1
+    topsql=[]
+    top10sql=[]
+    outsql=[]
+    conn=MySQLdb.connect(host='localhost',user='root',passwd='123456',db='oracle',port=3306)
+    cur=conn.cursor()
+    getsql_text='select * from oracle_topsegment where statistic_name=\"'+topsql_type+'\" and sql_time <='+ str(endtime)+' and sql_time >='+str(starttime)+' and tnsname=\''+tnsname+'\' and ipaddress=\''+ipaddress+'\' order by object_name,sql_time'
+    cur.execute(getsql_text)
+    row=cur.fetchall()
+    cur.close()
+    conn.close()
+    count=hour
+    sql_id='sql_id'
+    for i in row:
+        if i[4]==sql_id:
+            count=count+1
+            if count==hour:
+                maxtime=i
+                owner=maxtime[4].split('_')[0]
+                object_name=maxtime[4].split('.')[0].split('_')[1:len(maxtime[4].split('.')[0].split('_'))-1]
+                subobject_name=maxtime[4].split('.')[1]
+                object_name='_'.join(object_name)
+                #object_name=maxtime[4]
+                object_type=maxtime[4].split('.')[0].split('_')[-1]
+                value=maxtime[6]-mintime[6]
+                if value<0:
+                    value=maxtime[6]
+                else:
+                    pass
+                topsql.append([owner,object_name,subobject_name,object_type,value])
+        else:
+            if count!=hour and sql_id !='sql_id':
+                outsql1=str(mintime[4])+'-'+str(mintime[5])+' is wrapped out '+str(hour-count)+' times'
+                outsql.append(outsql1)
+            mintime=i
+            count=1
+            sql_id=i[4]
+
+    if topsql_type=='elapsedtime':
+        topsql.sort(key=lambda x:x[6],reverse=True)
+    else:
+        topsql.sort(key=lambda x:x[4],reverse=True)
+    for n in range(0,top if len(topsql)>=top else len(topsql)):
+        top10sql.append(topsql[n])
+    result['top10sql']=top10sql
+    if len(outsql)!=0:
+        result['outsql']=outsql
+    else:
+        result['outsql']=[]
+    return result
+
+
+
+def check_topsql_finaltest(starttime,endtime,ipaddress,tnsname,topsql_type,top):
+    hour=0
+    result={}
+    for i in range(starttime,endtime,3600):
+        hour=hour+1
+    topsql=[]
+    top10sql=[]
+    outsql=[]
+    conn=MySQLdb.connect(host='localhost',user='root',passwd='123456',db='oracle',port=3306)
+    cur=conn.cursor()
+    getsql_text='select * from oracle_oracle_'+topsql_type+' where sql_time <='+ str(endtime)+' and sql_time >='+str(starttime)+' and tnsname=\''+tnsname+'\' and ipaddress=\''+ipaddress+'\' order by sql_id ,sql_time'
+    cur.execute(getsql_text)
+    row=cur.fetchall()
+    cur.close()
+    conn.close()
+    count=hour
+    sql_id='sql_id'
+    for i in row:
+        if i[4]==sql_id:
+            count=count+1
+            if count==hour:
+                maxtime=i
+                sql_id= maxtime[4]
+                sql_text=maxtime[10]
+                topsqltype=maxtime[5]-mintime[5]
+                executions=maxtime[6]-mintime[6]
+                module=maxtime[9]
+                if executions==0:
+                    executions='1:0'
+                    if topsqltype>=0:
+                        per_executions=float(topsqltype/int(executions.split(':')[0]))
+                        cpu_time=abs(float(((maxtime[7]-mintime[7]))/int(executions.split(':')[0]))/1000000)
+                        elapsed_time=abs(float(((maxtime[8]-mintime[8]))/int(executions.split(':')[0]))/1000000)
+                    else:
+                        per_executions=float(maxtime[5]/int(executions.split(':')[0]))
+                        cpu_time=abs(float((maxtime[7])/int(executions.split(':')[0]))/1000000)
+                        elapsed_time=abs(float((maxtime[8])/int(executions.split(':')[0]))/1000000)
+                elif  executions<0:
+                    executions=maxtime[6]
+                    if topsqltype>=0:
+                        per_executions=float(topsqltype/executions)
+                        cpu_time=abs(float(((maxtime[7]-mintime[7])/executions))/1000000)
+                        elapsed_time=abs(float(((maxtime[8]-mintime[8])/executions))/1000000)
+                    else:
+                        per_executions=float(maxtime[5]/executions)
+                        cpu_time=abs(float((maxtime[7]/executions))/1000000)
+                        elapsed_time=abs(float((maxtime[8]/executions))/1000000)
+                elif executions>0:
+                     if topsqltype>=0:
+                        per_executions=float(topsqltype/executions)
+                        cpu_time=abs(float(((maxtime[7]-mintime[7])/executions))/1000000)
+                        elapsed_time=abs(float(((maxtime[8]-mintime[8])/executions))/1000000)
+                     else:
+                        per_executions=float(maxtime[5]/executions)
+                        cpu_time=abs(float((maxtime[7]/executions))/1000000)
+                        elapsed_time=abs(float((maxtime[8]/executions))/1000000)
+                topsql.append([sql_id,sql_text,topsqltype,executions,per_executions,cpu_time,elapsed_time,module])
+        else:
+            if count!=hour and sql_id !='sql_id':
+                outsql1=str(mintime[4])+'-'+str(mintime[10])+'-'+str(mintime[5])+'-'+str(mintime[6])+' is wrapped out '+str(hour-count)+' times'
+                outsql.append(outsql1)
+            mintime=i
+            count=1
+            sql_id=i[4]
+
+    if topsql_type=='elapsedtime':
+        topsql.sort(key=lambda x:x[6],reverse=True)
+    else:
+        topsql.sort(key=lambda x:x[2],reverse=True)
+    for n in range(0,top if len(topsql)>=top else len(topsql)):
+        top10sql.append(topsql[n])
+    result['top10sql']=top10sql
+    if len(outsql)!=0:
+        result['outsql']=outsql
+    else:
+        result['outsql']=[]
+    return result
+
+def check_topsql_final(starttime,endtime,ipaddress,tnsname,topsql_type,top):
+    hour=0
+    result={}
+    for i in range(starttime,endtime,3600):
+        hour=hour+1
+    topsql=[]
+    top10sql=[]
+    outsql=[]
+    conn=MySQLdb.connect(host='localhost',user='root',passwd='123456',db='oracle',port=3306)
+    cur=conn.cursor()
+    getsql_text='select * from oracle_oracle_'+topsql_type+' where sql_time <='+ str(endtime)+' and sql_time >='+str(starttime)+' and tnsname=\''+tnsname+'\' and ipaddress=\''+ipaddress+'\' order by sql_id ,sql_time'
+    cur.execute(getsql_text)
+    row=cur.fetchall()
+    cur.close()
+    conn.close()
+    count=hour
+    sql_id='sql_id'
+    for i in row:
+        if i[4]==sql_id:
+            count=count+1
+            if count==hour:
+                maxtime=i
+                sql_id= maxtime[4]
+                sql_text=maxtime[10]
+            	#topsqltype=maxtime[5]-mintime[5]
+            	#executions=maxtime[6]-mintime[6]
+                topsqltype=abs(maxtime[5]-mintime[5])
+                executions=abs(maxtime[6]-mintime[6])
+	#	if topsqltype<0:
+	#	    topsqltype=maxtime[5]
+	#	if executions<0:
+	#	    executions=maxtime[6]
+                module=maxtime[9]
+                if executions==0:
+                    executions='1:0'
+                    per_executions=float(topsqltype/int(executions.split(':')[0]))
+                    cpu_time=abs(float(((maxtime[7]-mintime[7]))/int(executions.split(':')[0]))/1000000)
+                    elapsed_time=abs(float(((maxtime[8]-mintime[8]))/int(executions.split(':')[0]))/1000000)
+                else:
+                    per_executions=float(topsqltype/executions)
+                    cpu_time=abs(float(((maxtime[7]-mintime[7])/executions))/1000000)
+                    elapsed_time=abs(float(((maxtime[8]-mintime[8])/executions))/1000000)
+                topsql.append([sql_id,sql_text,topsqltype,executions,per_executions,cpu_time,elapsed_time,module])  
+        else:
+            if count!=hour and sql_id !='sql_id':
+                outsql1=str(mintime[4])+'-'+str(mintime[10])+'-'+str(mintime[5])+'-'+str(mintime[6])+' is wrapped out '+str(hour-count)+' times'
+                outsql.append(outsql1)
+            mintime=i
+            count=1
+            sql_id=i[4]
+	    
+    if topsql_type=='elapsedtime':
+        topsql.sort(key=lambda x:x[6],reverse=True)
+    else:
+        topsql.sort(key=lambda x:x[2],reverse=True)
+    for n in range(0,top if len(topsql)>=top else len(topsql)):
+        top10sql.append(topsql[n])
+    result['top10sql']=top10sql
+    if len(outsql)!=0:
+        result['outsql']=outsql
+    else:
+        result['outsql']=[]
+    return result
+
+
+
+def check_topsql_elapsedtime(starttime,endtime,ipaddress,tnsname,topsql_type,top):
+    hour=0
+    result={}
+    for i in range(starttime,endtime,3600):
+        hour=hour+1
+    topsql=[]
+    top10sql=[]
+    outsql=[]
+    conn=MySQLdb.connect(host='localhost',user='root',passwd='123456',db='oracle',port=3306)
+    cur=conn.cursor()
+    getsql_text='select * from oracle_oracle_'+topsql_type+' where sql_time <='+ str(endtime)+' and sql_time >='+str(starttime)+' and tnsname=\''+tnsname+'\' and ipaddress=\''+ipaddress+'\' order by sql_id ,sql_time'
+    cur.execute(getsql_text)
+    row=cur.fetchall()
+    cur.close()
+    conn.close()
+    count=hour
+    sql_id='sql_id'
+    for i in row:
+        if i[4]==sql_id:
+            count=count+1
+            if count==hour:
+                maxtime=i
+                sql_id= maxtime[4]
+                sql_text=maxtime[9]
+                elapsedtime=abs((maxtime[7]-mintime[7]))/1000000
+                executions=abs(maxtime[5]-mintime[5])
+                module=maxtime[8]
+                if executions==0:
+                    executions='1:0'
+                    per_executions=float(elapsedtime/int(executions.split(':')[0]))
+                    cpu_time=abs(float(((maxtime[6]-mintime[6]))/int(executions.split(':')[0]))/1000000)
+                else:
+                    per_executions=float(elapsedtime/executions)
+                    cpu_time=abs(float(((maxtime[6]-mintime[6]))/executions)/1000000)
+                topsql.append([sql_id,sql_text,elapsedtime,executions,per_executions,cpu_time,module])  
+        else:
+            if count!=hour and sql_id !='sql_id':
+                outsql1=str(mintime[4])+'-'+str(mintime[9])+'-'+str(mintime[7])+'-'+str(mintime[5])+' is wrapped out '+str(hour-count)+' times'
+                outsql.append(outsql1)
+            mintime=i
+            count=1
+            sql_id=i[4]
+	    
+    topsql.sort(key=lambda x:x[2],reverse=True)
+    for n in range(0,top if len(topsql)>=top else len(topsql)):
+        top10sql.append(topsql[n])
+    result['top10sql']=top10sql
+    if len(outsql)!=0:
+        result['outsql']=outsql
+    else:
+        result['outsql']=[]
+    return result
+
+
+def check_topsql_cputime(starttime,endtime,ipaddress,tnsname,topsql_type,top):
+    hour=0
+    result={}
+    for i in range(starttime,endtime,3600):
+        hour=hour+1
+    topsql=[]
+    top10sql=[]
+    outsql=[]
+    conn=MySQLdb.connect(host='localhost',user='root',passwd='123456',db='oracle',port=3306)
+    cur=conn.cursor()
+    getsql_text='select * from oracle_oracle_'+topsql_type+' where sql_time <='+ str(endtime)+' and sql_time >='+str(starttime)+' and tnsname=\''+tnsname+'\' and ipaddress=\''+ipaddress+'\' order by sql_id ,sql_time'
+    cur.execute(getsql_text)
+    row=cur.fetchall()
+    cur.close()
+    conn.close()
+    count=hour
+    sql_id='sql_id'
+    for i in row:
+        if i[4]==sql_id:
+            count=count+1
+            if count==hour:
+                maxtime=i
+                sql_id= maxtime[4]
+                sql_text=maxtime[9]
+                cputime=abs((maxtime[6]-mintime[6]))/1000000
+		#if cputime<0:
+		 #   cputime=maxtime[6]
+            	#executions=maxtime[5]-mintime[5]
+                executions=abs(maxtime[5]-mintime[5])
+		#if executions<0:
+		 #   executions=maxtime[5]
+                module=maxtime[8]
+                if executions==0:
+                    executions='1:0'
+                    per_executions=float(cputime/int(executions.split(':')[0]))
+                    elapsed_time=abs(float(((maxtime[7]-mintime[7]))/int(executions.split(':')[0]))/1000000)
+                else:
+                    per_executions=float(cputime/executions)
+                    elapsed_time=abs(float(((maxtime[7]-mintime[7])/executions))/1000000)
+                topsql.append([sql_id,sql_text,cputime,executions,per_executions,elapsed_time,module])  
+        else:
+            if count!=hour and sql_id !='sql_id':
+                outsql1=str(mintime[4])+'-'+str(mintime[9])+'-'+str(mintime[6])+'-'+str(mintime[5])+' is wrapped out '+str(hour-count)+' times'
+                outsql.append(outsql1)
+            mintime=i
+            count=1
+            sql_id=i[4]
+	    
+    topsql.sort(key=lambda x:x[2],reverse=True)
+    for n in range(0,top if len(topsql)>=top else len(topsql)):
+        top10sql.append(topsql[n])
+    result['top10sql']=top10sql
+    if len(outsql)!=0:
+        result['outsql']=outsql
+    else:
+        result['outsql']=[]
+    return result
+
+
+
+def check_topsql_topevent(starttime,endtime,ipaddress,tnsname,topsql_type,top):
+    hour=0
+    result={}
+    for i in range(starttime,endtime,3600):
+        hour=hour+1
+    topsql=[]
+    top10sql=[]
+    outsql=[]
+    conn=MySQLdb.connect(host='localhost',user='root',passwd='123456',db='oracle',port=3306)
+    cur=conn.cursor()
+    getsql_text='select * from oracle_oracle_'+topsql_type+' where sql_time <='+ str(endtime)+' and sql_time >='+str(starttime)+' and tnsname=\''+tnsname+'\' and ipaddress=\''+ipaddress+'\' order by event_name ,sql_time'
+    cur.execute(getsql_text)
+    row=cur.fetchall()
+    cur.close()
+    conn.close()
+    count=hour
+    idle=['LNS ASYNC end of log','DIAG idle wait','wait for unread message on broadcast channel','PING','Streams AQ: waiting for messages in the queue','shared server idle wait','GCR sleep','ASM background timer','gcs remote message','ges remote message','class slave wait','Streams AQ: waiting for time management or cleanup tasks','jobq slave wait','SQL*Net message from client','rdbms ipc message','pmon timer','Streams AQ: qmn coordinator idle wait','Streams AQ: qmn slave idle wait','smon timer','dispatcher timer','PX Idle Wait','wakeup time manager','virtual circuit status','Space Manager: slave idle wait']
+    event_name='event_name'
+    for i in row:
+        if i[4] not in idle:
+            if i[4]==event_name :
+                count=count+1
+                if count==hour:
+                    maxtime=i
+                    event= maxtime[4]
+                    total_waits=abs((maxtime[7]-mintime[7]))
+                    total_timeouts=abs((maxtime[6]-mintime[6]))
+                    waittime=abs((maxtime[5]-mintime[5]))/100
+                    if total_waits!=0:
+                        avgwaittime=round(float(waittime)/total_waits*1000,0)
+                    else:
+                        avgwaittime=waittime*1000
+                    topsql.append([event,total_waits,total_timeouts,waittime,avgwaittime])  
+            else:
+                if count!=hour and event_name !='event_name':
+                    outsql1=str(mintime[4])+' is wrapped out '+str(hour-count)+' times'
+                    outsql.append(outsql1)
+                mintime=i
+                count=1
+                event_name=i[4]
+        else:
+            pass
+	    
+    topsql.sort(key=lambda x:x[3],reverse=True)
+    for n in range(0,top if len(topsql)>=top else len(topsql)):
+        top10sql.append(topsql[n])
+    result['top10sql']=top10sql
+    if len(outsql)!=0:
+        result['outsql']=outsql
+    else:
+        result['outsql']=[]
+    return result
+
+
+ 
+
+if __name__ == '__main__':
+    endtime=1438567200+60
+    starttime=1438563600
+    ipaddress='10.65.1.110'
+    tnsname='mesft'
+    topsql_type='buffergets'
+    result= check_topsql_final(starttime,endtime,ipaddress,tnsname,topsql_type)
+    print (result)
+
+
+
+
+
+
+
+
+
+

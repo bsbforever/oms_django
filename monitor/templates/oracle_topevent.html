@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block jscript%}
+<script>
+function ck(b)
+{
+    var input = document.getElementsByTagName("input");
+
+    for (var i=0;i<input.length ;i++ )
+    {
+        if(input[i].type=="checkbox")
+            input[i].checked = b;
+    }
+}
+</script>
+
+<script>
+$(function() {
+    var frm=$('#usubmit');
+    frm.submit(function (ev) {
+        $.ajax({
+            type:frm.attr('method'),
+            url:frm.attr('action'),
+            data:frm.serialize(),
+            success: function (data) {
+                alert(data);
+		$('#container').load(document.URL +  '#container');
+                #$('#newadd').remove()
+                #$('#content').append(data);
+            }
+
+   });
+    ev.preventDefault();
+})
+
+})
+</script>
+
+
+{%endblock%}
+
+{% block topevent %} <li class="active"><a href="/monitor/oracle_topevent">Oracle等待事件</a></li>{% endblock %}
+
+
+{% block content %}
+
+
+<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" id='content'>
+    <h1 class='page-header'>Oracle等待事件</h1>
+
+
+<form  id='usubmit' action="/monitor/performance" method="post">{% csrf_token %}
+<p><h3>请选择需要查询的数据库</h3></p>
+<br/>
+{{ form.as_p }}
+{{form.errors.as_table}}
+<p><label>开始时间: </label><input id="d11" name ="starttime" value="{{stime}}" type="text" class="Wdate" onFocus="WdatePicker({isShowWeek:true,lang:'zh-cn',dateFmt:'yyyyMMdd'})"/></p>
+<p><label>结束时间:</label><input id="d11" name ="endtime"  value="{{etime}}" type="text"  class="Wdate" onFocus="WdatePicker({isShowWeek:true,lang:'zh-cn',dateFmt:'yyyyMMdd'})"/></p>
+<h4>选择数据间隔</h4>
+<input type="radio" value="day" checked name="interval">天</input>
+<input type="radio" value="hour"   name="interval">小时</input>
+<br></br>
+<h4>选择性能指标</h4>
+<input type="radio" value="total_waits" checked name="wait">总等待次数</input>
+<input type="radio" value="avg_wait"   name="wait">平均等待时间</input>
+<br></br>
+<p><input type="submit" value="提交" target=blank/></p>
+
+</form>
+</div>
+
+<div id="container" style="min-width:700px;height:400px"></div>
+
+
+{% endblock %}

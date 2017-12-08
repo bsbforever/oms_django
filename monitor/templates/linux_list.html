@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block linux %} <li class="active"><a href="/monitor/linux_list">服务器列表</a></li>{% endblock %}
+{%block jscript%} 
+
+<script>
+    $(document).ready(function(){
+          $("#table").fitText();
+  });
+</script>
+
+{%endblock%}
+{% block content %}
+<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" id='content'>
+    <h1 class='page-header'>Linux服务器列表</h1>
+<div class="table-responsive">
+<table class="table" id='table1' class="table table-striped" width='1052'>
+  <thead>
+    <tr>
+      <th>IP地址</th>
+      <th>主机名</th>
+      <th>系统版本</th>
+      <th>监控级别</th>
+      <th>性能级别</th>
+     <!--   <th>用途</th>    -->
+    </tr>
+  </thead>
+{% for i in result %}
+<tbody>
+            <tr>
+                <td>{{i.ipaddress}}</td>
+                <td>{{i.hostname}}</td>
+                <td>{{i.os}}</td>
+                <td>{{i.monitor_type}}</td>
+                <td>{{i.performance_type}}</td>
+<!--                <td>{{i.content}}</td>   -->
+            </tr>
+</tbody>
+{% endfor %}
+</table>
+</div>
+</div>
+</div>
+{% endblock %}

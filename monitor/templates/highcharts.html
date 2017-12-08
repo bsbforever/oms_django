@@ -1,0 +1,58 @@
+<div id='newadd'>
+<script>
+$(function () {
+    $('#container').highcharts({
+        title: {
+            text: '{{title|safe}}',
+            x: -20 //center
+        },
+        xAxis: {
+            categories: {{categories|safe}}
+        },
+        yAxis: {
+            title: {
+                text: '{{unit}}'
+            },
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }]
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            borderWidth: 0
+        },
+
+         plotOptions: {
+    	    series: {
+                cursor: 'pointer',
+	        point: {
+        	events: {
+            	    click: function(e) {
+			 $("#test3").val(this.y+'s'+this.x);
+                	//上面是当前页跳转，如果是要跳出新页面，那就用
+                	//window.open(e.point.url);
+                	//这里的url要后面的data里给出
+		}
+        	}
+
+    	    },
+    	    }
+	   },
+
+
+        series:[
+		{% for i in series %}
+		{
+		    name: '{{i.name}}',
+		    data: {{i.data}}
+		    },
+		{% endfor %}
+	        ]		     
+	});
+});			  
+</script>
+</div>

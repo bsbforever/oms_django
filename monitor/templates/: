@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Oracle监控系统</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/static/favicon.ico">
+    <script src="/static/js/jquery-3.1.1.js"></script>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"></script>
+    <script src="/static/js/jquery.fittext.js"></script>
+    <link href="data:text/css;charset=utf-8," data-href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" rel="stylesheet" id="bs-theme-stylesheet">
+   <!-- Custom styles for this template -->
+    <link href="/static/css/dashboard.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="/static/js/ie-emulation-modes-warning.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="http://cdn.bootcss.com/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="http://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    {% block jscript %} <link href="/static/css/dashboard.css" rel="stylesheet"> {% endblock %}
+</head>
+<body>
+
+ <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Oracle监控系统</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="#">Dashboard</a></li>
+            <li><a _blank_=True href="/admin">Settings</a></li>
+            <li><a href="#">Profile</a></li>
+            <li><a href="#">Help</a></li>
+          </ul>
+          <form class="navbar-form navbar-right">
+            <input type="text" class="form-control" placeholder="Search...">
+          </form>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+           {% block overview %} <li> <a href="/monitor/">首页</a></li>{%endblock%}
+           {% block dbstatus1%}<li><a href="#">数据库状态</a></li>{%endblock%}
+           {% block dbstatus2%}<li><a href="#">数据库统计</a></li>{%endblock%}
+           {% block command %} <li> <a href="/monitor/oracle_command">Oracle命令</a></li> {%endblock%}
+          </ul>
+          <ul class="nav nav-sidebar">
+            <li><a href="">数据库等待事件</a></li>
+            {%block day%}<li><a href="/monitor/oracle_performance/">数据库性能(天/周)</a></li> {%endblock%}
+            <li><a href="">数据库性能(时)</a></li>
+            <li><a href="">数据库TOPSQL</a></li>
+            <li><a href="">数据库命中率</a></li>
+            <li><a href="">数据库性能基线</a></li>
+          </ul>
+          <ul class="nav nav-sidebar">
+            <li><a href="">服务器空间</a></li>
+           {%block cpu %} <li><a href="">服务器CPU内存</a></li> {%endblock%}
+          </ul>
+        </div>
+
+<br></br>
+{%block content %} Content{% endblock %}
+</body>
+</html>
