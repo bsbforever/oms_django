@@ -3,7 +3,7 @@ from sendmail_phone import *
 
 def checkscriptstatus():
     mailcontent=[]
-    fp=open("/home/oms/mysite/crontab.log",'rw')
+    fp=open("/home/oms/mysite/crontab.log",'r')
     content=fp.readlines()
     for i in content:
         mailcontent.append(i)

@@ -1,0 +1,170 @@
+Traceback (most recent call last):
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/base/base.py", line 213, in ensure_connection
+    self.connect()
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/base/base.py", line 189, in connect
+    self.connection = self.get_new_connection(conn_params)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/mysql/base.py", line 274, in get_new_connection
+    conn = Database.connect(**conn_params)
+  File "/usr/local/python36/lib/python3.6/site-packages/MySQLdb/__init__.py", line 86, in Connect
+    return Connection(*args, **kwargs)
+  File "/usr/local/python36/lib/python3.6/site-packages/MySQLdb/connections.py", line 204, in __init__
+    super(Connection, self).__init__(*args, **kwargs2)
+_mysql_exceptions.OperationalError: (1045, "Access denied for user 'oracle'@'localhost' (using password: YES)")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/oms/mysite/manage.py", line 22, in <module>
+    execute_from_command_line(sys.argv)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/core/management/__init__.py", line 364, in execute_from_command_line
+    utility.execute()
+  File "/usr/local/python36/lib/python3.6/site-packages/django/core/management/__init__.py", line 356, in execute
+    self.fetch_command(subcommand).run_from_argv(self.argv)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/core/management/base.py", line 283, in run_from_argv
+    self.execute(*args, **cmd_options)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/core/management/base.py", line 327, in execute
+    self.check()
+  File "/usr/local/python36/lib/python3.6/site-packages/django/core/management/base.py", line 359, in check
+    include_deployment_checks=include_deployment_checks,
+  File "/usr/local/python36/lib/python3.6/site-packages/django/core/management/base.py", line 346, in _run_checks
+    return checks.run_checks(**kwargs)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/core/checks/registry.py", line 81, in run_checks
+    new_errors = check(app_configs=app_configs)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/core/checks/model_checks.py", line 30, in check_all_models
+    errors.extend(model.check(**kwargs))
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/models/base.py", line 1284, in check
+    errors.extend(cls._check_fields(**kwargs))
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/models/base.py", line 1359, in _check_fields
+    errors.extend(field.check(**kwargs))
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/models/fields/__init__.py", line 913, in check
+    errors = super(AutoField, self).check(**kwargs)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/models/fields/__init__.py", line 219, in check
+    errors.extend(self._check_backend_specific_checks(**kwargs))
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/models/fields/__init__.py", line 322, in _check_backend_specific_checks
+    return connections[db].validation.check_field(self, **kwargs)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/mysql/validation.py", line 49, in check_field
+    field_type = field.db_type(self.connection)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/models/fields/__init__.py", line 644, in db_type
+    return connection.data_types[self.get_internal_type()] % data
+  File "/usr/local/python36/lib/python3.6/site-packages/django/utils/functional.py", line 35, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/mysql/base.py", line 174, in data_types
+    if self.features.supports_microsecond_precision:
+  File "/usr/local/python36/lib/python3.6/site-packages/django/utils/functional.py", line 35, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/mysql/features.py", line 53, in supports_microsecond_precision
+    return self.connection.mysql_version >= (5, 6, 4) and Database.version_info >= (1, 2, 5)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/utils/functional.py", line 35, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/mysql/base.py", line 385, in mysql_version
+    with self.temporary_connection() as cursor:
+  File "/usr/local/python36/lib/python3.6/contextlib.py", line 82, in __enter__
+    return next(self.gen)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/base/base.py", line 591, in temporary_connection
+    cursor = self.cursor()
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/base/base.py", line 254, in cursor
+    return self._cursor()
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/base/base.py", line 229, in _cursor
+    self.ensure_connection()
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/base/base.py", line 213, in ensure_connection
+    self.connect()
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/utils.py", line 94, in __exit__
+    six.reraise(dj_exc_type, dj_exc_value, traceback)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/utils/six.py", line 685, in reraise
+    raise value.with_traceback(tb)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/base/base.py", line 213, in ensure_connection
+    self.connect()
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/base/base.py", line 189, in connect
+    self.connection = self.get_new_connection(conn_params)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/mysql/base.py", line 274, in get_new_connection
+    conn = Database.connect(**conn_params)
+  File "/usr/local/python36/lib/python3.6/site-packages/MySQLdb/__init__.py", line 86, in Connect
+    return Connection(*args, **kwargs)
+  File "/usr/local/python36/lib/python3.6/site-packages/MySQLdb/connections.py", line 204, in __init__
+    super(Connection, self).__init__(*args, **kwargs2)
+django.db.utils.OperationalError: (1045, "Access denied for user 'oracle'@'localhost' (using password: YES)")
+Traceback (most recent call last):
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/base/base.py", line 213, in ensure_connection
+    self.connect()
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/base/base.py", line 189, in connect
+    self.connection = self.get_new_connection(conn_params)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/mysql/base.py", line 274, in get_new_connection
+    conn = Database.connect(**conn_params)
+  File "/usr/local/python36/lib/python3.6/site-packages/MySQLdb/__init__.py", line 86, in Connect
+    return Connection(*args, **kwargs)
+  File "/usr/local/python36/lib/python3.6/site-packages/MySQLdb/connections.py", line 204, in __init__
+    super(Connection, self).__init__(*args, **kwargs2)
+_mysql_exceptions.OperationalError: (1045, "Access denied for user 'oracle'@'localhost' (using password: YES)")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/oms/mysite/manage.py", line 22, in <module>
+    execute_from_command_line(sys.argv)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/core/management/__init__.py", line 364, in execute_from_command_line
+    utility.execute()
+  File "/usr/local/python36/lib/python3.6/site-packages/django/core/management/__init__.py", line 356, in execute
+    self.fetch_command(subcommand).run_from_argv(self.argv)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/core/management/base.py", line 283, in run_from_argv
+    self.execute(*args, **cmd_options)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/core/management/base.py", line 327, in execute
+    self.check()
+  File "/usr/local/python36/lib/python3.6/site-packages/django/core/management/base.py", line 359, in check
+    include_deployment_checks=include_deployment_checks,
+  File "/usr/local/python36/lib/python3.6/site-packages/django/core/management/base.py", line 346, in _run_checks
+    return checks.run_checks(**kwargs)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/core/checks/registry.py", line 81, in run_checks
+    new_errors = check(app_configs=app_configs)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/core/checks/model_checks.py", line 30, in check_all_models
+    errors.extend(model.check(**kwargs))
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/models/base.py", line 1284, in check
+    errors.extend(cls._check_fields(**kwargs))
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/models/base.py", line 1359, in _check_fields
+    errors.extend(field.check(**kwargs))
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/models/fields/__init__.py", line 913, in check
+    errors = super(AutoField, self).check(**kwargs)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/models/fields/__init__.py", line 219, in check
+    errors.extend(self._check_backend_specific_checks(**kwargs))
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/models/fields/__init__.py", line 322, in _check_backend_specific_checks
+    return connections[db].validation.check_field(self, **kwargs)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/mysql/validation.py", line 49, in check_field
+    field_type = field.db_type(self.connection)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/models/fields/__init__.py", line 644, in db_type
+    return connection.data_types[self.get_internal_type()] % data
+  File "/usr/local/python36/lib/python3.6/site-packages/django/utils/functional.py", line 35, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/mysql/base.py", line 174, in data_types
+    if self.features.supports_microsecond_precision:
+  File "/usr/local/python36/lib/python3.6/site-packages/django/utils/functional.py", line 35, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/mysql/features.py", line 53, in supports_microsecond_precision
+    return self.connection.mysql_version >= (5, 6, 4) and Database.version_info >= (1, 2, 5)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/utils/functional.py", line 35, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/mysql/base.py", line 385, in mysql_version
+    with self.temporary_connection() as cursor:
+  File "/usr/local/python36/lib/python3.6/contextlib.py", line 82, in __enter__
+    return next(self.gen)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/base/base.py", line 591, in temporary_connection
+    cursor = self.cursor()
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/base/base.py", line 254, in cursor
+    return self._cursor()
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/base/base.py", line 229, in _cursor
+    self.ensure_connection()
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/base/base.py", line 213, in ensure_connection
+    self.connect()
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/utils.py", line 94, in __exit__
+    six.reraise(dj_exc_type, dj_exc_value, traceback)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/utils/six.py", line 685, in reraise
+    raise value.with_traceback(tb)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/base/base.py", line 213, in ensure_connection
+    self.connect()
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/base/base.py", line 189, in connect
+    self.connection = self.get_new_connection(conn_params)
+  File "/usr/local/python36/lib/python3.6/site-packages/django/db/backends/mysql/base.py", line 274, in get_new_connection
+    conn = Database.connect(**conn_params)
+  File "/usr/local/python36/lib/python3.6/site-packages/MySQLdb/__init__.py", line 86, in Connect
+    return Connection(*args, **kwargs)
+  File "/usr/local/python36/lib/python3.6/site-packages/MySQLdb/connections.py", line 204, in __init__
+    super(Connection, self).__init__(*args, **kwargs2)
+django.db.utils.OperationalError: (1045, "Access denied for user 'oracle'@'localhost' (using password: YES)")
