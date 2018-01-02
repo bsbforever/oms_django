@@ -3,6 +3,21 @@
 {% block jscript%}
 
 <script>
+function ck(b)
+{
+    var input = document.getElementsByTagName("input");
+
+    for (var i=0;i<input.length ;i++ )
+    {
+        if(input[i].type=="checkbox")
+            input[i].checked = b;
+    }
+}
+</script>
+
+
+
+<script>
 $(function() {
     var frm=$('#usubmit');
     frm.submit(function (ev) {
@@ -90,8 +105,9 @@ $(function() {
 <form  id='usubmit' action="/monitor/oracle_performance" method="post">{% csrf_token %}
 <p><h3>请选择需要查询的数据库</h3></p>
 <br/>
-{{ form.as_p }}
-{{form.errors.as_table}}
+{{ form.as_ul}}
+{{form.errors.as_p}}
+<p><input type="button" onclick="ck(true)" value="全选"><input type="button" onclick="ck(false)" value="取消全选"></p>
 <p><label>开始时间: </label><input id="d11" name ="starttime" value="{{stime}}" type="text" class="Wdate" onFocus="WdatePicker({isShowWeek:true,lang:'zh-cn',dateFmt:'yyyyMMdd'})"/></p>
 <p><label>结束时间:</label><input id="d11" name ="endtime"  value="{{etime}}" type="text"  class="Wdate" onFocus="WdatePicker({isShowWeek:true,lang:'zh-cn',dateFmt:'yyyyMMdd'})"/></p>
 <h4>选择数据间隔</h4>

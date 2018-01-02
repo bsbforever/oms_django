@@ -1,5 +1,4 @@
 #coding=utf-8
-#coding=gbk
 from django.core.management.base import BaseCommand
 from monitor.models import oraclelist
 from monitor.models import *
