@@ -33,13 +33,25 @@ def check_active_session_count(cursor):
 
 
 def checkjob(cursor):
-    cursor.execute('select failures from dba_jobs a where round((sysdate-this_date)*24,2) >1 or failures<>0')
+    cursor.execute('select failures from dba_jobs a where round((sysdate-this_date)*24,2) >2 or failures<>0')
     #cursor.execute('select failures from dba_jobs')
     row=cursor.fetchone()
     if row is None:
         return 'normal'
     else:
         return 'error'
+
+def checkactivesession(cursor):
+    fp=open(os.environ['HOME_DIR']+'/mysite/monitor/command/sql/getsession.sql','r')
+    fp1=fp.read()
+    s=cursor.execute(fp1)
+    fp.close()
+    row=s.fetchone()
+    if row is None:
+        return 'normal'
+    else:
+        return 'error'
+
 def checkifrac(cursor):
     cursor.execute('select value from v$option where  parameter=\'Real Application Clusters\'')
     row=cursor.fetchone()
@@ -219,7 +231,7 @@ if __name__ == '__main__':
     else:
         cursor = db.cursor()
         #j=check_mv_compile_states(cursor)
-        s=checkjob(cursor)
+        s=getactivesession(cursor)
         cursor.close()
         db.close()
         print (s)
