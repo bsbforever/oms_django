@@ -30,6 +30,7 @@ def Send_Message(Token,Tag,Subject,Content):
        'agentid' : 1000002,      #企业号应用的agentid
        'text' : {
            'content' : Subject+'\n'+Content
+           #'content' : SubjectContent
        },
        'safe':0
     }
@@ -40,9 +41,10 @@ def Send_Message(Token,Tag,Subject,Content):
 
     try:
         r =requests.post(post_url,data=json.dumps(post_data))
-       # request_post = urllib.request.urlopen(post_url,json_post_data.encode(encoding='UTF8'))
+        #r =requests.post(post_url,data=json.dumps(post_data,ensure_ascii=False))
+        #request_post = urllib.request.urlopen(post_url,json_post_data.encode(encoding='UTF8'))
     except Exception as e:
-        print (e)
+        print ('sss'+ str(e))
     #print (request_post.text)
 
 

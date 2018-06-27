@@ -9,6 +9,7 @@ class Command(BaseCommand):
         mailcontent=[]
         ip=oraclelist.objects.all().order_by('tnsname')
         for i in ip:
+            #print (i.ipaddress)
             if i.monitor_type==1:
                 ipaddress=i.ipaddress
                 username=i.username
@@ -25,6 +26,11 @@ class Command(BaseCommand):
                     cursor = db.cursor()
                     job=checkjob(cursor)
                     session=checkactivesession(cursor)
+                    if tnsname=='hdb':
+                        asm=checkasm(cursor)
+                        if asm=='error':   
+                            asmresult=  'The Size of ASM diskgroup  On  '+i.tnsname +' almost full '
+                            mailcontent.append(asmresult)
                     cursor.close()
                     db.close()
                     if job=='error':   
@@ -34,6 +40,7 @@ class Command(BaseCommand):
                         sessionresult=  'The Session On  '+i.tnsname +' have long running sessions '
                         mailcontent.append(sessionresult)
         if len(mailcontent) != 0:
+            #print ('dda')
             mailcontent='\n'.join(mailcontent)
             send_mail_phone(to_list,'Oracle Job&Session  Status Monitor',mailcontent)
             token=GetToken()

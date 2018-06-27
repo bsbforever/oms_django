@@ -2,7 +2,14 @@
 from django.core.management.base import BaseCommand
 from monitor.models import oraclelist
 from monitor.models import oraclestatus
+import os
+import redis
+import time
+import types
 from monitor.command.getoracleinfo import *
+from monitor.command.sendmail_phone import * 
+r=redis.StrictRedis()
+nowtime=str(time.time()).split('.')[0]
 class Command(BaseCommand):
     def handle(self, *args, **options):
         oraclestatus.objects.all().delete()
@@ -16,22 +23,33 @@ class Command(BaseCommand):
                     tnsname1=i.tnsname
                     try:
                         db = cx_Oracle.connect(username+'/'+password+'@'+ipaddress1+':'+port+'/'+tnsname1 ,mode=cx_Oracle.SYSDBA)
-                    except Exception , e:
+                    except Exception as e:
                         content= (i.ipaddress+' is Unreachable,The reason is '+str(e)).strip()
-                        print content
+                        send_mail(to_list,'Oracle Monitor Exception Occured',content)
+                        print (content)
+                        break
                     else:
-			cursor = db.cursor()
+                        cursor = db.cursor()
+                        #jobstatus=checkjob(cursor)
                         dbsize=getdbsize(cursor)
                         tbstatus=getspace(cursor)
+			#invalid_object=checkinvalidobject(cursor)
+			#mv_compile_state=check_mv_compile_states(cursor)
                         oracle_info=check_info(cursor)
                         sga_size=get_sga_size(cursor)
+			#segsize=getsegsize(cursor)
                         cursor.close()
                         db.close()
-                        if oraclestatus.objects.filter(ipaddress=ipaddress1).filter(tnsname=tnsname1):
+			#if segsize:
+			#	sizekey='SegSize='+ipaddress1+'='+tnsname1
+			#	value=nowtime+':'+str(segsize)
+			#	r.lpush(sizekey,value)
+                        if oraclestatus.objects.filter(ipaddress=ipaddress1):
                             status=oraclestatus.objects.filter(ipaddress=ipaddress1)
-                            status.update(**{'tnsname':tnsname1,'ipaddress':ipaddress1,'dbsize':dbsize,'tbstatus':tbstatus,'host_name':oracle_info[0],'version':oracle_info[1],'startup_time':oracle_info[2],'archiver':oracle_info[3],'sga_size':sga_size})
+                            status.update(**{'tnsname':tnsname1,'ipaddress':ipaddress1,'dbsize':dbsize,'tbstatus':tbstatus,'host_name':oracle_info[0],'version':oracle_info[1],'startup_time':oracle_info[2],'archiver':oracle_info[4],'sga_size':sga_size})
                         else:
-                            createtnsname=oraclestatus(ipaddress=ipaddress1,tnsname=tnsname1)
+                            createtnsname=oraclestatus(ipaddress=ipaddress1)
                             createtnsname.save()
-                            status=oraclestatus.objects.filter(ipaddress=ipaddress1).filter(tnsname=tnsname1)
-                            status.update(**{'tnsname':tnsname1,'ipaddress':ipaddress1,'dbsize':dbsize,'tbstatus':tbstatus,'host_name':oracle_info[0],'version':oracle_info[1],'startup_time':oracle_info[2],'archiver':oracle_info[3],'sga_size':sga_size})
+                            status=oraclestatus.objects.filter(ipaddress=ipaddress1)
+                            status.update(**{'tnsname':tnsname1,'ipaddress':ipaddress1,'dbsize':dbsize,'tbstatus':tbstatus,'host_name':oracle_info[0],'version':oracle_info[1],'startup_time':oracle_info[2],'archiver':oracle_info[4],'sga_size':sga_size})
+			

@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block jscript%}
+
+<script>
+function ck(b)
+{
+    var input = document.getElementsByTagName("input");
+
+    for (var i=0;i<input.length ;i++ )
+    {
+        if(input[i].type=="checkbox")
+            input[i].checked = b;
+    }
+}
+</script>
+
+
+
+<script>
+$(function() {
+    var frm=$('#usubmit');
+    frm.submit(function (ev) {
+        $.ajax({
+            type:frm.attr('method'),
+            url:frm.attr('action'),
+            data:frm.serialize(),
+            success: function (data) {
+                #alert(data);
+                $('#newadd').remove()
+                $('#content').append(data);
+            }
+
+   });
+    ev.preventDefault();
+})
+
+})
+</script>
+<script>
+$(function() {
+    var a= $('#operate');
+    var b= $('#sqlarea');
+    var options= $('#operate option');
+    a.on('change',function() {
+        var result=$('#operate option').filter(':selected').val();
+        names=['check_analyzed_time','check_process_text' ,'check_session_process' ,'check_sqlplan' ,'check_unboundsql']
+        //alert(result)
+        if ($.inArray(result,names)>-1){
+            b.show();
+      } else
+            b.hide();
+       });
+
+})
+
+</script>
+
+<script>
+$(function(){
+var c=$('#sql1')
+c.on('focus',function(){
+        c.innerHTML=''
+        //alert('sa')
+        })
+})
+</script>
+
+
+<script>
+
+$(function() {
+    var frm=$('#usubmit');
+    frm.submit(function (ev) {
+        $.ajax({
+            type:frm.attr('method'),
+            url:frm.attr('action'),
+            data:frm.serialize(),
+            success: function (data) {
+                //alert(data);
+                $('#newadd').remove()
+                $('#content').append(data);
+            }
+
+   });
+    ev.preventDefault();
+})
+
+})
+</script>
+
+
+{%endblock%}
+
+{% block cpumem_day %} <li class="active"><a href="/monitor/cpumem_day">服务器CPU内存(天/周)</a></li>{% endblock %}
+
+
+{% block content %}
+
+
+<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" id='content'>
+    <h1 class='page-header'>数据库性能(天/周)</h1>
+
+
+<form  id='usubmit' action="/monitor/cpumem_day" method="post">{% csrf_token %}
+<p><h3>请选择需要查询的数据库</h3></p>
+<br/>
+{{ form.as_ul}}
+{{form.errors.as_p}}
+<p><input type="button" onclick="ck(true)" value="全选"><input type="button" onclick="ck(false)" value="取消全选"></p>
+<p><label>开始时间: </label><input id="d11" name ="starttime" value="{{stime}}" type="text" class="Wdate" onFocus="WdatePicker({isShowWeek:true,lang:'zh-cn',dateFmt:'yyyyMMdd'})"/></p>
+<p><label>结束时间:</label><input id="d11" name ="endtime"  value="{{etime}}" type="text"  class="Wdate" onFocus="WdatePicker({isShowWeek:true,lang:'zh-cn',dateFmt:'yyyyMMdd'})"/></p>
+<h4>选择数据间隔</h4>
+<input type="radio" value="day" checked name="interval">天</input>
+<input type="radio" value="week"   name="interval">周</input>
+<p><input type="submit" value="提交" /></p>
+
+</form>
+<div id="container" style="min-width:700px;height:400px"></div>
+</div>
+
+
+
+{% endblock %}

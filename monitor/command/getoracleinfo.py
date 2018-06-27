@@ -120,6 +120,15 @@ def getdbsize(cursor):
     result=row[0]
     return result    
 
+def checkasm(cursor):
+    #cursor.execute('select trunc(sum(bytes)/1024/1024/1024) Total from dba_segments')
+    cursor.execute('select round((1-free_mb/total_mb)*100,2)from v$asm_diskgroup')
+    row=cursor.fetchall()
+    for  i in row:
+        if i[0]>=85:
+            return 'error'
+    return 'normal'    
+
 def getsegsize(cursor):
     cursor.execute('select trunc(sum(bytes)/1024/1024/1024) Total from dba_segments')
     #cursor.execute('select trunc(sum(bytes)/1024/1024/1024) Total from dba_data_files')
@@ -128,7 +137,7 @@ def getsegsize(cursor):
     return result    
 
 def getspace(cursor):
-    fp=open('/ezio/website/oracle/monitor/tablespacesize.sql','r') 
+    fp=open('/home/oms/mysite/monitor/command/sql/tablespacesize.sql','r') 
     fp1=fp.read()
     s=cursor.execute(fp1)
     fp.close()
@@ -217,11 +226,11 @@ def get_segment_change(cursor):
         return row
 
 if __name__ == '__main__':
-    ipaddress='10.65.1.120'
+    ipaddress='10.65.202.201'
     username='sys'
-    password='ase_sys_n'
+    password='ase_sys_1'
     port='1521'
-    tnsname='dctest'
+    tnsname='hdb'
     try:
         db = cx_Oracle.connect(username+'/'+password+'@'+ipaddress+':'+port+'/'+tnsname ,mode=cx_Oracle.SYSDBA)
     except Exception as  e:
@@ -231,7 +240,7 @@ if __name__ == '__main__':
     else:
         cursor = db.cursor()
         #j=check_mv_compile_states(cursor)
-        s=getactivesession(cursor)
+        s=checkasm(cursor)
         cursor.close()
         db.close()
         print (s)

@@ -18,6 +18,7 @@ from django.contrib.auth.models import User, Group
 from monitor.command.views_getoraclecommandresult import *
 from monitor.command.views_performance import *
 from monitor.command.views_oracleperformance import *
+from monitor.command.views_linuxperformance import *
 from monitor.command.views_oracletopsql import *
 
 
@@ -194,6 +195,63 @@ def oracle_status(request):
     result=oraclestatus.objects.all().order_by('tnsname')
     dic ={'result':result}
     return render_to_response('oracle_status.html',dic)
+
+
+def cpumem_day(request):
+    baseline=[]
+    ip=[]
+    ip1=linuxlist.objects.all().order_by('ipaddress')
+    for i in ip1:
+        ip.append(i.ipaddress+':'+i.hostname)
+    if request.method == 'POST': # If the form has been submitted...
+        #return HttpResponse('ss')
+        form = charts_cpumem_day(request.POST) # A form bound to the POST data
+        if form.is_valid(): # All validation rules pass
+            starttime1  = request.POST['starttime']
+            endtime1  = request.POST['endtime']
+            #return HttpResponse(starttime1)
+            performance_type= form.cleaned_data['performance_type']
+            ipaddress_hostname_list=form.cleaned_data['ipaddress']
+            interval=request.POST['interval']
+            if starttime1 =='' or endtime1 =='':
+                return HttpResponse('Please give the Start and End time')
+            else:
+                starttime=int(str(time.mktime(time.strptime(starttime1,'%Y%m%d'))).split('.')[0])
+                endtime=int(str(time.mktime(time.strptime(endtime1,'%Y%m%d'))).split('.')[0])
+            if  starttime>endtime:
+                return HttpResponse('The Start time must larger than the End time')
+                #starttime=int(str(time.mktime(time.strptime(starttime1,'%Y%m%d %H:%M:%S'))))
+                #endtime=int(str(time.mktime(time.strptime(endtime1,'%Y%m%d %H:%M:%S'))))
+            else:
+                    title='Linux Performance '+'-'+performance_type
+                    subtitle=performance_type
+                    title_y='%'
+                    final_series=[]
+                    #final_series=oracle_performance_day(performance_type,ipaddress_tnsname_list,starttime,endtime,interval)
+                    #return HttpResponse(final_series)
+                    if interval=='day':
+                        final_series=linux_performance_day(performance_type,ipaddress_hostname_list,starttime,endtime,interval)
+                        x_categories=final_series[0]['x']
+                    elif interval=='week':
+                        final_series=linux_performance_week(performance_type,ipaddress_hostname_list,starttime,endtime,interval)
+                        x_categories=final_series[0]['x']
+                    #return HttpResponse(final_series)
+                    dic={'categories':x_categories,'series':final_series,'title':title,'subtitle':subtitle,'unit':'%','title_y':title_y}
+                    #return render_to_response('highcharts_histogram.html',dic) # Redirect after POST
+                    #return HttpResponse (final_series)
+                    return render_to_response('highcharts.html',dic) # Redirect after POST
+        else:
+           return render(request, 'cpumem_day.html', {'form': form})
+    else:
+        form = charts_cpumem_day() # An unbound form
+        d1=datetime.datetime.now()
+        etime= d1.strftime("%Y%m%d")
+        stime=(d1-datetime.timedelta(hours=720)).strftime("%Y%m%d")
+        #etime= d1.strftime("%Y%m%d %H")
+        #stime=(d1-datetime.timedelta(hours=24)).strftime("%Y%m%d %H")
+        dic={'form':form,'etime':etime,'stime':stime}
+        #dic={'form':form,'ip':ip,'ipaddress_checked':ipaddress_checked,'etime':etime,'stime':stime}
+        return render(request, 'cpumem_day.html', dic)
 
 
 def oracle_performance(request):

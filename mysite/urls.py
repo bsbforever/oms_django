@@ -19,5 +19,6 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^monitor/', include('monitor.urls')),
+    #url(r'^excecl/', include('django_excel.urls')),
     url(r'^', include('monitor.urls'))
 ]

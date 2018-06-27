@@ -64,7 +64,7 @@ def oracle_performance_day(performance_type,ipaddress_tnsname_list,starttime,end
     for starttime1 in range(starttime,endtime+1,86400):
         timearray=time.localtime(starttime1)
         x.append(time.strftime("%Y-%m-%d",timearray))
-
+    #return x
     for ipaddress_tnsname in ipaddress_tnsname_list:
         key=performance_type+'='+ipaddress_tnsname.split(':')[0]+'='+ipaddress_tnsname.split(':')[1]
         if performance_type in ['LogicalReads','PhysicalReads']:
@@ -88,6 +88,7 @@ def oracle_performance_day(performance_type,ipaddress_tnsname_list,starttime,end
         for i in result:
             j=i.decode().split(':') #b'1511157600:175548353'
             #return j[1]
+            #if int(j[0]) >=starttime and int(j[0])<endtime:
             if int(j[0]) >=starttime and int(j[0])<endtime+86400:
                 value= time.localtime(int(j[0])) #time.struct_time(tm_year=2017, tm_mon=11, tm_mday=19, tm_hour=14
                 dt = time.strftime(format, value).split() # before split format 2017-11-19 14:21:03
@@ -99,6 +100,7 @@ def oracle_performance_day(performance_type,ipaddress_tnsname_list,starttime,end
                 dvalue.append(int(j[1]))
         #return dvalue
         result=pd.DataFrame({'week':dweek,'date':ddate,'time':dtime,'value':dvalue})
+        #return result
         day_df=result['value'].groupby(result['date'])
         day_result=(day_df.max() - day_df.min())/unit
         series_reindex=pd.DataFrame({'date':day_result.index.values.tolist(),'value':day_result.values.tolist()})
@@ -240,10 +242,10 @@ def oracle_topevent_day_total_waits(performance_type,ipaddress_tnsname_list,star
     return final_series
 if __name__ == '__main__':
     performance_type='DBTime'
-    ipaddress_tnsname_list=['10.65.1.119:DCPROD','10.65.1.172:ASEN']
+    ipaddress_tnsname_list=['10.65.202.203:hdb']
     unit=60000000
     interval='day'
-    starttime=1464710400
-    endtime=1476201600
+    starttime=1528387200
+    endtime=1528473600
     print (oracle_performance_day(performance_type,ipaddress_tnsname_list,starttime,endtime,interval))
     #print oracle_performance_week(performance_type,ipaddress_tnsname_list,starttime,endtime,interval)
