@@ -124,7 +124,7 @@ def getsqlplan(cursor,sqlid):
 if __name__ == '__main__':
     ipaddress='10.65.1.120'
     username='sys'
-    password='ase_sys_n'
+    password='11111'
     port='1521'
     tnsname='dctest'
     try:
